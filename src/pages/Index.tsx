@@ -15,12 +15,14 @@ const Index = () => {
     queryKey: ["search", searchQuery],
     queryFn: () => performSearch(searchQuery),
     enabled: !!searchQuery,
-    onError: () => {
-      toast({
-        title: "Search Error",
-        description: "An error occurred while searching. Please try again.",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Search Error",
+          description: "An error occurred while searching. Please try again.",
+          variant: "destructive",
+        });
+      },
     },
   });
 
