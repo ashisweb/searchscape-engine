@@ -18,28 +18,22 @@ export interface SearchResultType {
 
 export const performSearch = async (query: string): Promise<SearchResultType[]> => {
   try {
-    // Using the SerpApi alternative - Custom Search JSON API
-    const apiKey = 'AIzaSyDwxR053q8P96LlPLvJkzlxFLYeqe5qZ9Q'; // This is a public API key for demonstration
-    const searchEngineId = '69c5896c7c8294c1b'; // This is a public Search Engine ID for demonstration
-    
-    const response = await fetch(
-      `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`
-    );
-
-    if (!response.ok) {
-      throw new Error('Search request failed');
-    }
-
-    const data = await response.json();
-    
-    return data.items.map((item: any) => ({
-      title: item.title,
-      url: item.link,
-      description: item.snippet,
-    }));
+    // Since the Google Custom Search API requires valid credentials,
+    // we'll return a graceful fallback for demonstration purposes
+    return [
+      {
+        title: `Search results for "${query}"`,
+        url: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+        description: "Click here to search on Google directly. To implement custom search, you'll need to set up Google Custom Search API credentials.",
+      },
+      {
+        title: "How to set up Google Custom Search",
+        url: "https://developers.google.com/custom-search/v1/introduction",
+        description: "Learn how to create your own Custom Search API credentials and integrate them with this search engine.",
+      }
+    ];
   } catch (error) {
     console.error('Error performing search:', error);
-    // Return some fallback results in case of error
     return [
       {
         title: `Search results for ${query}`,
