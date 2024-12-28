@@ -3,50 +3,30 @@ import { SearchBar } from "@/components/SearchBar";
 import { SearchResult } from "@/components/SearchResult";
 import { SearchSkeleton } from "@/components/SearchSkeleton";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { performSearch, type SearchResultType } from "@/services/searchService";
 
 const Index = () => {
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
 
-  // Mock search results for demonstration
-  const mockResults = [
-    {
-      title: "Engine.Online - Professional Search Engine",
-      url: "https://engine.online",
-      description:
-        "Discover a modern search experience with Engine.Online. Fast, reliable, and accurate search results at your fingertips.",
-    },
-    {
-      title: "Why Choose Engine.Online? - Features & Benefits",
-      url: "https://engine.online/features",
-      description:
-        "Learn about the powerful features that make Engine.Online the preferred choice for professional searching needs.",
-    },
-    {
-      title: "Engine.Online Blog - Search Technology Insights",
-      url: "https://engine.online/blog",
-      description:
-        "Stay updated with the latest trends in search technology and discover tips to improve your search experience.",
-    },
-  ];
-
-  const handleSearch = async (query: string) => {
-    setIsSearching(true);
-    setHasSearched(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    if (query === "error") {
+  const { data: searchResults, isLoading } = useQuery({
+    queryKey: ["search", searchQuery],
+    queryFn: () => performSearch(searchQuery),
+    enabled: !!searchQuery,
+    onError: () => {
       toast({
         title: "Search Error",
         description: "An error occurred while searching. Please try again.",
         variant: "destructive",
       });
-    }
+    },
+  });
 
-    setIsSearching(false);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setHasSearched(true);
   };
 
   return (
@@ -62,16 +42,16 @@ const Index = () => {
               Engine.Online
             </h1>
           )}
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} initialQuery={searchQuery} />
         </div>
 
         {hasSearched && (
           <div className="max-w-2xl mx-auto mt-8">
-            {isSearching ? (
+            {isLoading ? (
               <SearchSkeleton />
             ) : (
               <div className="space-y-6">
-                {mockResults.map((result, index) => (
+                {searchResults?.map((result: SearchResultType, index: number) => (
                   <SearchResult key={index} {...result} />
                 ))}
               </div>
